@@ -1,0 +1,9 @@
+[submodule "/Users/cmccartan/.vim/pack/dist/start/tmuxline.vim"]
+	path = /Users/cmccartan/.vim/pack/dist/start/tmuxline.vim
+	url = https://github.com/edkolev/tmuxline.vim
+[submodule "/Users/cmccartan/.vim/pack/dist/start/vim-airline"]
+	path = /Users/cmccartan/.vim/pack/dist/start/vim-airline
+	url = https://github.com/vim-airline/vim-airline
+[submodule "/Users/cmccartan/.vim/pack/colors/opt/everforest"]
+	path = /Users/cmccartan/.vim/pack/colors/opt/everforest
+	url = https://github.com/sainnhe/everforest

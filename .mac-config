@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+sudo -v # get permission up front
+
+# Disable the sound effects on boot
+sudo nvram SystemAudioVolume=" "
+
+# Disable the warning when changing a file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Remove the spring loading delay for directories
+# Time before directory opens when dragging over it
+defaults write NSGlobalDomain com.apple.springing.delay -float 0
+
+# Use list view in all Finder windows by default
+# Four-letter codes for the other view modes: `icnv`, `clmv`, `Flwv`
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+# Expand save panel by default
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+
+# Expand print panel by default
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool truec
+
+# Remove annoying scrolling
+defaults write -g NSScrollViewRubberbanding -int 0
+defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool FALSE
+
+# VSCode key repeat
+defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false

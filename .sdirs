@@ -1,0 +1,4 @@
+export DIR_doc="$HOME/Documents"
+export DIR_down="$HOME/Downloads"
+export DIR_desk="$HOME/Desktop"
+export DIR_res="$HOME/Documents/Work/Research"

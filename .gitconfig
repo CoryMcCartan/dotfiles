@@ -1,0 +1,20 @@
+[user]
+	name = Cory McCartan
+	email = cory.mccartan@gmail.com
+[credential]
+	helper = osxkeychain
+[help]
+	autocorrect = 1
+[pull]
+	rebase = false
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[init]
+	defaultBranch = main
+[push]
+	autoSetupRemote = true
+[core]
+	excludesFile = ~/.gitignore

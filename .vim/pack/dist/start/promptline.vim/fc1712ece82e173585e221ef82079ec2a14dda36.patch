@@ -1,0 +1,80 @@
+From fc1712ece82e173585e221ef82079ec2a14dda36 Mon Sep 17 00:00:00 2001
+From: plexigras <plexigras@aol.com>
+Date: Tue, 27 Jun 2017 05:54:02 +0200
+Subject: [PATCH] change to true color codes
+
+---
+ autoload/promptline.vim        | 10 ++++++++--
+ autoload/promptline/themes.vim | 28 ++++++++++++++--------------
+ 2 files changed, 22 insertions(+), 16 deletions(-)
+
+diff --git a/autoload/promptline.vim b/autoload/promptline.vim
+index 121d1f7..c689005 100644
+--- a/autoload/promptline.vim
++++ b/autoload/promptline.vim
+@@ -40,11 +40,17 @@ fun! s:validate_file(overwrite, file)
+ endfun
+ 
+ fun! s:bg(color)
+-  return printf('"${wrap}%d;5;%d${end_wrap}"', s:SHELL_BG_CODE, a:color)
++  let r = str2nr(a:color[1:2], 16)
++  let g = str2nr(a:color[3:4], 16)
++  let b = str2nr(a:color[5:6], 16)
++  return printf('"${wrap}%d;2;%d;%d;%d${end_wrap}"', s:SHELL_BG_CODE, r, g, b)
+ endfun
+ 
+ fun! s:fg(color)
+-  return printf('"${wrap}%d;5;%d${end_wrap}"', s:SHELL_FG_CODE, a:color)
++  let r = str2nr(a:color[1:2], 16)
++  let g = str2nr(a:color[3:4], 16)
++  let b = str2nr(a:color[5:6], 16)
++  return printf('"${wrap}%d;2;%d;%d;%d${end_wrap}"', s:SHELL_FG_CODE, r, g, b)
+ endfun
+ 
+ fun! promptline#create_snapshot(file, theme, preset) abort
+diff --git a/autoload/promptline/themes.vim b/autoload/promptline/themes.vim
+index b510b5d..5cc8332 100644
+--- a/autoload/promptline/themes.vim
++++ b/autoload/promptline/themes.vim
+@@ -25,13 +25,13 @@ endfun
+ 
+ fun! promptline#themes#create_theme_from_airline(mode_palette)
+   return {
+-        \'a'    : a:mode_palette.airline_a[2:4],
+-        \'b'    : a:mode_palette.airline_b[2:4],
+-        \'c'    : a:mode_palette.airline_c[2:4],
+-        \'x'    : a:mode_palette.airline_x[2:4],
+-        \'y'    : a:mode_palette.airline_y[2:4],
+-        \'z'    : a:mode_palette.airline_z[2:4],
+-        \'warn' : a:mode_palette.airline_warning[2:4]}
++        \'a'    : a:mode_palette.airline_a,
++        \'b'    : a:mode_palette.airline_b,
++        \'c'    : a:mode_palette.airline_c,
++        \'x'    : a:mode_palette.airline_x,
++        \'y'    : a:mode_palette.airline_y,
++        \'z'    : a:mode_palette.airline_z,
++        \'warn' : a:mode_palette.airline_warning}
+ endfun
+ 
+ fun! promptline#themes#load_stock_theme(theme_name) abort
+@@ -56,13 +56,13 @@ endfun
+ 
+ fun! promptline#themes#create_theme_from_lightline(mode_palette)
+   return {
+-        \'a'    : a:mode_palette.left[0][2:4],
+-        \'b'    : a:mode_palette.left[1][2:4],
+-        \'c'    : a:mode_palette.middle[0][2:4],
+-        \'x'    : a:mode_palette.middle[0][2:4],
+-        \'y'    : a:mode_palette.right[1][2:4],
+-        \'z'    : a:mode_palette.right[0][2:4],
+-        \'warn'  : a:mode_palette.warning[0][2:4]}
++        \'a'    : a:mode_palette.left[0],
++        \'b'    : a:mode_palette.left[1],
++        \'c'    : a:mode_palette.middle[0],
++        \'x'    : a:mode_palette.middle[0],
++        \'y'    : a:mode_palette.right[1],
++        \'z'    : a:mode_palette.right[0],
++        \'warn'  : a:mode_palette.warning[0]}
+ endfun
+ 
+ fun! promptline#themes#get_theme_from_vim()

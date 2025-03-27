@@ -1,0 +1,346 @@
+#!/usr/bin/env bash
+
+################# 
+# ALIASES
+################
+
+alias R='R --no-save -q'
+alias tree='Rscript -e "fs::dir_tree(recurse=5)"'
+alias top='top -i 20 -o mem'
+
+# cool colors
+alias ls='ls -pFhG'
+export LSCOLORS="Axfxcxdxexegedabagachx"
+alias grep='grep --color=auto'
+
+alias cls='clear && status'
+alias say='say -v Daniel'
+alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+
+# python
+alias python=python3
+alias pip=pip3
+alias pydoc=pydoc3
+
+
+################# 
+# FUNCTIONS
+################
+
+list-fns() {
+    cat ~/.functions | grep '()' | sed -e 's/....$//' | tail -n +3
+}
+
+# misc.
+status() {
+    A='\033[0;37m\033[7m' # gray BG, dark gray text
+    B='\033[0;33m\033[1m' # gold, bold text
+    C='\033[0;37m' # gray text
+    D='\033[5m'
+
+    echo
+    echo -n -e "  ${A} TERMINAL ${B} CORY McCARTAN ${C} "
+    date +"%l:%M %p %A, %B %e, %Y" 
+    echo 
+}
+
+# git
+git-del-history() {
+    git filter-branch --force --index-filter \
+        "git rm --cached --ignore-unmatch $1" \
+        --prune-empty --tag-name-filter cat -- --all
+    echo "Next, run: git push origin --force --all"
+}
+
+# General file system
+
+del() {
+    mv $1 ~/Trash
+}
+
+md() {
+    mkdir $1
+    cd $1
+}
+
+fcopy() {
+    cp $1 ~/.bin/.tmp/f-c-p-TEMPFILE
+    basename $1 > ~/.bin/.tmp/f-c-p-FILENAME
+}
+fpaste() {
+    if [ -z "$1" ]; then
+        cp ~/.bin/.tmp/f-c-p-TEMPFILE `cat ~/.bin/.tmp/f-c-p-FILENAME`
+    else
+        cp ~/.bin/.tmp/f-c-p-TEMPFILE $1
+    fi
+}
+
+cleanup() {
+    rm -rf $(brew --cache)
+    rm -rf ~/Library/Caches/pip
+}
+
+
+# PDF and Image processing
+
+cpdf() {
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  cpdf <OUTPUT> <INPUT FILE(s)>"
+    else
+        gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$1" "${@:2}"
+    fi
+}
+
+# qpdf <letter.pdf> --underlay <letterhead.pdf> -- <output.pdf>
+
+wta() {
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  wta <IMAGE>  (will overwrite)"
+    else
+        convert $1 -transparent white $1
+    fi
+}
+
+pdf2gif() {
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  pdf2gif <PDF> [<GIF>]"
+    else
+        if [ $# -eq 1 ]; then 
+            fout="${1%.*pdf}.gif"
+        else
+            fout=$2
+        fi
+        convert -alpha deactivate -verbose -delay 420 -loop 0 -density 150 $1 $fout
+    fi
+}
+
+exif() {
+    identify -format '%[EXIF:*]' $1
+}
+
+# Rendering and presenting
+
+serve() {
+    python -m http.server
+}
+
+rmd() {
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  rmd <FILE> [-p, --preview]"
+    else
+        Rscript -e "rmarkdown::render(\"$1\")"
+        if [ $# -eq 2 ] && ([ $2 == "-p" ] || [ $2 == "--preview" ]) ; then 
+            open "${1%.*md}.pdf"
+        fi
+    fi
+}
+
+# tex
+tinytex() {
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  tinytex <FILE.tex> [--xe]"
+    else
+        if [[ $1 != *.tex ]] ; then
+            fname="$1.tex"
+        else
+            fname="$1"
+        fi
+
+        if [[ $2 == "--xe" ]] ; then
+            Rscript -e "cat(tinytex::xelatex(\"$fname\"), '\n', sep='')"
+        else
+            Rscript -e "cat(tinytex::pdflatex(\"$fname\"), '\n', sep='')"
+        fi
+    fi
+}
+
+arxivify() {
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  arxivify <FILE.qmd> <other directories>"
+    else
+        if [[ $1 != *.qmd ]] ; then
+            base=$1
+        else
+            base="{$1%.qmd}"
+        fi
+        echo $base
+        quarto render $base.qmd &&\
+        pdflatex $base &&\
+        bibtex $base &&\
+        zip -vr arxiv.zip *.tex $base.bbl "${@:2}" -x "*.DS_Store" &&\
+        rm $base.aux $base.log $base.bbl $base.blg $base.out $base.pdf 
+    fi
+}
+
+parquetify() {
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  parquetify <input> [<output>]"
+    else
+        f_in="$1"
+        f_out="$2"
+        if [[ -z $2 ]]; then
+            f_out="${1%.*}.parquet"
+        fi
+
+        duckdb -line -init '' :memory: "copy '$f_in' to '$f_out' (FORMAT PARQUET, COMPRESSION ZSTD);"
+    fi
+}
+
+# audio
+ytdl() {
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  ytdl <URL> [<LOCAL DEST>]"
+    else
+        if [[ -z $2 ]] ; then
+            youtube-dl -i -o "%(title)s.%(ext)s" --extract-audio --audio-format mp3 --audio-quality 0 $1
+        else 
+            youtube-dl -i -o $2 --extract-audio --audio-format mp3 --audio-quality 0 $1
+        fi
+    fi
+}
+
+
+# Copilot 
+# Replace w/ output of `gh copilot alias -- bash` to update
+ghcs() {
+	TARGET="shell"
+	local GH_DEBUG="$GH_DEBUG"
+	local GH_HOST="$GH_HOST"
+
+	read -r -d '' __USAGE <<-EOF
+	Wrapper around \`gh copilot suggest\` to suggest a command based on a natural language description of the desired output effort.
+	Supports executing suggested commands if applicable.
+
+	USAGE
+	  $FUNCNAME [flags] <prompt>
+
+	FLAGS
+	  -d, --debug              Enable debugging
+	  -h, --help               Display help usage
+	      --hostname           The GitHub host to use for authentication
+	  -t, --target target      Target for suggestion; must be shell, gh, git
+	                           default: "$TARGET"
+
+	EXAMPLES
+
+	- Guided experience
+	  $ $FUNCNAME
+
+	- Git use cases
+	  $ $FUNCNAME -t git "Undo the most recent local commits"
+	  $ $FUNCNAME -t git "Clean up local branches"
+	  $ $FUNCNAME -t git "Setup LFS for images"
+
+	- Working with the GitHub CLI in the terminal
+	  $ $FUNCNAME -t gh "Create pull request"
+	  $ $FUNCNAME -t gh "List pull requests waiting for my review"
+	  $ $FUNCNAME -t gh "Summarize work I have done in issues and pull requests for promotion"
+
+	- General use cases
+	  $ $FUNCNAME "Kill processes holding onto deleted files"
+	  $ $FUNCNAME "Test whether there are SSL/TLS issues with github.com"
+	  $ $FUNCNAME "Convert SVG to PNG and resize"
+	  $ $FUNCNAME "Convert MOV to animated PNG"
+	EOF
+
+	local OPT OPTARG OPTIND
+	while getopts "dht:-:" OPT; do
+		if [ "$OPT" = "-" ]; then     # long option: reformulate OPT and OPTARG
+			OPT="${OPTARG%%=*}"       # extract long option name
+			OPTARG="${OPTARG#"$OPT"}" # extract long option argument (may be empty)
+			OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
+		fi
+
+		case "$OPT" in
+			debug | d)
+				GH_DEBUG=api
+				;;
+
+			help | h)
+				echo "$__USAGE"
+				return 0
+				;;
+
+			hostname)
+				GH_HOST="$OPTARG"
+				;;
+
+			target | t)
+				TARGET="$OPTARG"
+				;;
+		esac
+	done
+
+	# shift so that $@, $1, etc. refer to the non-option arguments
+	shift "$((OPTIND-1))"
+
+	TMPFILE="$(mktemp -t gh-copilotXXXXXX)"
+	trap 'rm -f "$TMPFILE"' EXIT
+	if GH_DEBUG="$GH_DEBUG" GH_HOST="$GH_HOST" gh copilot suggest -t "$TARGET" "$@" --shell-out "$TMPFILE"; then
+		if [ -s "$TMPFILE" ]; then
+			FIXED_CMD="$(cat $TMPFILE)"
+			builtin history -s -- $(builtin history 1 | cut -d' ' -f4-); builtin history -s -- "$FIXED_CMD"
+			echo
+			eval -- "$FIXED_CMD"
+		fi
+	else
+		return 1
+	fi
+}
+
+ghce() {
+	local GH_DEBUG="$GH_DEBUG"
+	local GH_HOST="$GH_HOST"
+
+	read -r -d '' __USAGE <<-EOF
+	Wrapper around \`gh copilot explain\` to explain a given input command in natural language.
+
+	USAGE
+	  $FUNCNAME [flags] <command>
+
+	FLAGS
+	  -d, --debug      Enable debugging
+	  -h, --help       Display help usage
+	      --hostname   The GitHub host to use for authentication
+
+	EXAMPLES
+
+	# View disk usage, sorted by size
+	$ $FUNCNAME 'du -sh | sort -h'
+
+	# View git repository history as text graphical representation
+	$ $FUNCNAME 'git log --oneline --graph --decorate --all'
+
+	# Remove binary objects larger than 50 megabytes from git history
+	$ $FUNCNAME 'bfg --strip-blobs-bigger-than 50M'
+	EOF
+
+	local OPT OPTARG OPTIND
+	while getopts "dh-:" OPT; do
+		if [ "$OPT" = "-" ]; then     # long option: reformulate OPT and OPTARG
+			OPT="${OPTARG%%=*}"       # extract long option name
+			OPTARG="${OPTARG#"$OPT"}" # extract long option argument (may be empty)
+			OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
+		fi
+
+		case "$OPT" in
+			debug | d)
+				GH_DEBUG=api
+				;;
+
+			help | h)
+				echo "$__USAGE"
+				return 0
+				;;
+
+			hostname)
+				GH_HOST="$OPTARG"
+				;;
+		esac
+	done
+
+	# shift so that $@, $1, etc. refer to the non-option arguments
+	shift "$((OPTIND-1))"
+
+	GH_DEBUG="$GH_DEBUG" GH_HOST="$GH_HOST" gh copilot explain "$@"
+}
