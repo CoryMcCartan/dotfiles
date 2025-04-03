@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+pushd /Applications/RStudio.app/Contents/
+
+strip-intel() {
+    lipo -remove x86_64 $1 -output $1
+}
+
+# Clean up Electron
+pushd "Frameworks/Electron Framework.framework/Versions/Current"
+strip-intel "Electron Framework"
+for lib in Libraries/*.dylib
+do
+    strip-intel "$lib"
+done
+cd Resources
+rm v8_context_snapshot.x86_64.bin
+for lproj in *.lproj
+do
+    [ "$lib" != "en.lproj" ] && rm -r "$name"
+done
+popd
+
+# Clean up main app and quarto
+cd Resources
+for lproj in *.lproj
+do
+    [ "$lib" != "en.lproj" ] && rm -r "$name"
+done
+
+cd app
+rm bin/rsession
+rm Frameworks/*.dylib
+
+cd quarto/bin/tools
+ln -s $(readlink -f $(which typst)) aarch64/typst
+rm -rf x86_64
+
+popd

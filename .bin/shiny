@@ -1,0 +1,26 @@
+#!/usr/bin/env Rscript
+
+doc <- 'Command-line interface to `Shiny`
+
+Usage:
+  shiny (launch|serve) [--port=<port>] [<path>]
+
+Options:
+  -h --help      Show this screen
+  -v --version   Show version
+  --port=<port>  Port to host on, as in `shiny::runApp`
+  <path>         Path to the application, as in `shiny::runApp` [default: .]
+'
+
+vers =  paste0(as.character(packageVersion("shiny")), "\n")
+args <- docopt::docopt(doc, version=vers)
+
+path = args$path
+if (is.null(path)) path = "."
+
+port = suppressWarnings(as.integer(args$port))
+if (length(port) == 0 || is.na(port)) port = getOption("shiny.port")
+
+suppressPackageStartupMessages(
+    shiny::runApp(path, port=port, launch.browser=args$launch)
+)

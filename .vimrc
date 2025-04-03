@@ -43,8 +43,6 @@ autocmd BufNewFile,BufRead .Rprofile   set syntax=r
 autocmd FileType tex set regexpengine=1
 " crontab editing
 au FileType crontab setlocal bkc=yes
-" colors ??
-autocmd VimEnter * hi Normal ctermbg=none
 "}}}
 " Syntax {{{
 " filetype based plugins etc
@@ -200,24 +198,32 @@ let g:airline_powerline_fonts = 1
 let g:airline_section_warning = ''
 let g:airline#extensions#tabline#tabs_label = ' '
 let g:airline_theme="everforest"
-let g:airline#extensions#tmuxline#enabled = 0
-let g:airline#extensions#tmuxline#snapshot_file = "~/.tmux-status.conf"
-let g:airline#extensions#promptline#enabled = 0
-let g:airline#extensions#promptline#snapshot_file = "~/.promptline.sh"
-let g:tmuxline_preset = {
-        \'a'    : '#S',
-        \'win'  : '#I #{b:pane_current_path}',
-        \'cwin' : '#I #{b:pane_current_path}',
-        \ 'z': '%R',
-        \ 'options': {
-        \'status-justify': 'left'}
-        \}
 let g:promptline_theme = "airline"
-let g:promptline_preset = {
-        \'a' : [ promptline#slices#host() ],
-        \'c' : [ promptline#slices#cwd({ 'dir_limit': 2 }) ],
-        \'y' : [ promptline#slices#vcs_branch() ],
-        \'warn' : [ promptline#slices#last_exit_code() ]}
+let g:airline#extensions#tmuxline#enabled = 0
+let g:airline#extensions#promptline#enabled = 0
+"let g:airline#extensions#tmuxline#snapshot_file = "~/.tmux-status.conf"
+"let g:airline#extensions#promptline#snapshot_file = "~/.bin/promptline.sh"
+function RebuildPowerline()
+    let g:tmuxline_preset = {
+            \'a'    : '#S',
+            \'win'  : '#I #{b:pane_current_path}',
+            \'cwin' : '#I #{b:pane_current_path}',
+            \ 'z': '%R',
+            \ 'options': {
+            \'status-justify': 'left'}
+            \}
+    let g:promptline_preset = {
+            \'a' : [ promptline#slices#host() ],
+            \'c' : [ promptline#slices#cwd({ 'dir_limit': 2 }) ],
+            \'y' : [ promptline#slices#vcs_branch() ],
+            \'z' : [ promptline#slices#git_status() ],
+            \'warn' : [ promptline#slices#jobs() ]}
+    :Tmuxline airline
+    TmuxlineSnapshot! ~/.tmux-status.conf
+    PromptlineSnapshot! ~/.bin/promptline.sh
+endfunction
+" colors ??
+" autocmd VimEnter * hi Normal ctermbg=none
 
 "" These lines setup the environment to show graphics and colors correctly.
 set nocompatible

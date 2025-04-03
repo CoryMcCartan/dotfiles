@@ -10,10 +10,11 @@ alias top='top -i 20 -o mem'
 
 # cool colors
 alias ls='ls -pFhG'
-export LSCOLORS="Axfxcxdxexegedabagachx"
+export LSCOLORS="Exfxcxdxcxegedabagachx"
 alias grep='grep --color=auto'
 
 alias cls='clear && status'
+alias spotify='spotify_player 2>/dev/null' 
 alias say='say -v Daniel'
 alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
 
@@ -46,10 +47,14 @@ status() {
 
 # git
 git-del-history() {
-    git filter-branch --force --index-filter \
-        "git rm --cached --ignore-unmatch $1" \
-        --prune-empty --tag-name-filter cat -- --all
-    echo "Next, run: git push origin --force --all"
+    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+        echo "Usage:  git-del-history <FILE>"
+    else
+        git filter-branch --force --index-filter \
+            "git rm --cached --ignore-unmatch $1" \
+            --prune-empty --tag-name-filter cat -- --all
+        echo "Next, run: git push origin --force --all"
+    fi
 }
 
 # General file system
@@ -78,6 +83,10 @@ fpaste() {
 cleanup() {
     rm -rf $(brew --cache)
     rm -rf ~/Library/Caches/pip
+}
+
+strip-intel() {
+    lipo -remove x86_64 $1 -output $1
 }
 
 

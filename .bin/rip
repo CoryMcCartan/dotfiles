@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+pushd ~/Music/
+mkdir .tmp
+cd .tmp/
+cdparanoia -B
+drutil eject
+for i in *.cdda.wav; do ffmpeg -i "$i" -acodec libmp3lame "${i%.*}.mp3"; done
+mv *.mp3 ../upload/
+rm *.cdda.wav
+cd ..
+rmdir .tmp
+popd
