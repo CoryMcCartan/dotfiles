@@ -29,11 +29,38 @@ alias pydoc=pydoc3
 ################
 
 list-fns() {
-    cat ~/.functions | grep '()' | sed -e 's/....$//' | tail -n +3
+    cat ~/.functions | grep -e '()' -e "^#' " | sed -e 's/() {//' -e "s/^#'/\n----/" | tail -n +3
 }
 
-# misc.
-status() {
+#' Shell and files ----
+map() {                 # Apply function to list
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
+        echo "Usage:  map <COMMAND>"
+        echo
+        echo 'If <COMMAND> does not contain the placeholder argument `_`, then it is added at the end'
+    else
+        if [[ "$*" =~ (^| )"_"($| ) ]]; then # has _ in it
+            xargs -I _ $*
+        else
+            xargs -I _ $* _
+        fi
+    fi
+}
+filter() {              # Keep elements in list based on predicate 
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
+        echo "Usage:  filter <COMMAND>"
+        echo
+        echo 'If <COMMAND> does not contain the placeholder argument `_`, then it is added at the end'
+    else
+        if [[ "$*" =~ (^| )"_"($| ) ]]; then # has _ in it
+            xargs -I _ sh -c "test $* && echo '_'"
+        else
+            xargs -I _ sh -c "test $* '_' && echo '_'"
+        fi
+    fi
+}
+
+status() {              # Print terminal status
     A='\033[0;37m\033[7m' # gray BG, dark gray text
     B='\033[0;33m\033[1m' # gold, bold text
     C='\033[0;37m' # gray text
@@ -43,78 +70,68 @@ status() {
     echo -n -e "  ${A} TERMINAL ${B} CORY McCARTAN ${C} "
     date +"%l:%M %p %A, %B %e, %Y" 
     echo 
+
 }
 
-# git
-git-del-history() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
-        echo "Usage:  git-del-history <FILE>"
-    else
-        git filter-branch --force --index-filter \
-            "git rm --cached --ignore-unmatch $1" \
-            --prune-empty --tag-name-filter cat -- --all
-        echo "Next, run: git push origin --force --all"
-    fi
-}
-
-# General file system
-
-del() {
+del() {                 # Move a file to the Trash
     mv $1 ~/Trash
 }
 
-md() {
+md() {                  # Create a directory and move into it
     mkdir $1
     cd $1
 }
 
-fcopy() {
+fcopy() {               # Copy a file to a special clipboard
     cp $1 ~/.bin/.tmp/f-c-p-TEMPFILE
     basename $1 > ~/.bin/.tmp/f-c-p-FILENAME
 }
-fpaste() {
-    if [ -z "$1" ]; then
+fpaste() {              # Paste a file from the special clipboard
+    if [[ -z "$1" ]]; then
         cp ~/.bin/.tmp/f-c-p-TEMPFILE `cat ~/.bin/.tmp/f-c-p-FILENAME`
     else
         cp ~/.bin/.tmp/f-c-p-TEMPFILE $1
     fi
 }
 
-cleanup() {
-    rm -rf $(brew --cache)
-    rm -rf ~/Library/Caches/pip
-}
-
-strip-intel() {
+strip-intel() {         # Remove x86_64 code from a binary
     lipo -remove x86_64 $1 -output $1
 }
 
 
-# PDF and Image processing
+#' PDF and Image processing -----
 
-cpdf() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+cpdf() {                # Concatenate PDF files
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  cpdf <OUTPUT> <INPUT FILE(s)>"
     else
         gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$1" "${@:2}"
     fi
 }
 
-# qpdf <letter.pdf> --underlay <letterhead.pdf> -- <output.pdf>
+letterhead() {          # Add university letterhead to PDF
+    LH=~/Documents/Work/Letters/letterhead.pdf
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
+        echo "Usage:  letterhead <FILE>"
+    else
+        qpdf $1 --replace-input --underlay $LH --
+    fi
+}
 
-wta() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+
+wta() {                 # Set white pixels to transparent
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  wta <IMAGE>  (will overwrite)"
     else
         convert $1 -transparent white $1
     fi
 }
 
-pdf2gif() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+pdf2gif() {             # Convert PDF pages to GIF
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  pdf2gif <PDF> [<GIF>]"
     else
-        if [ $# -eq 1 ]; then 
+        if [[ $# -eq 1 ]]; then 
             fout="${1%.*pdf}.gif"
         else
             fout=$2
@@ -123,30 +140,30 @@ pdf2gif() {
     fi
 }
 
-exif() {
+exif() {                # Print EXIF information
     identify -format '%[EXIF:*]' $1
 }
 
-# Rendering and presenting
+#' Rendering and presenting ----
 
-serve() {
+serve() {               # Local Python HTTP server
     python -m http.server
 }
 
-rmd() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+rmd() {                 # Compile an R Markdown file
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  rmd <FILE> [-p, --preview]"
     else
         Rscript -e "rmarkdown::render(\"$1\")"
-        if [ $# -eq 2 ] && ([ $2 == "-p" ] || [ $2 == "--preview" ]) ; then 
+        if [[ $# -eq 2 ]] && ([[ $2 == "-p" ]] || [[ $2 == "--preview" ]]) ; then 
             open "${1%.*md}.pdf"
         fi
     fi
 }
 
 # tex
-tinytex() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+tinytex() {             # Compile TeX via TinyTeX
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  tinytex <FILE.tex> [--xe]"
     else
         if [[ $1 != *.tex ]] ; then
@@ -163,8 +180,8 @@ tinytex() {
     fi
 }
 
-arxivify() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+arxivify() {            # Create a ZIP file for arXiv
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  arxivify <FILE.qmd> <other directories>"
     else
         if [[ $1 != *.qmd ]] ; then
@@ -181,8 +198,8 @@ arxivify() {
     fi
 }
 
-parquetify() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+parquetify() {          # Convert a file to Parquet
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  parquetify <input> [<output>]"
     else
         f_in="$1"
@@ -195,9 +212,36 @@ parquetify() {
     fi
 }
 
-# audio
-ytdl() {
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ] ; then 
+#' Audio ----
+radio() {               # Play radio stations
+    case "$1" in
+        "-h" | "--help" | "")
+            echo "Usage:  radio <CALLSIGN>"
+            echo
+            echo "News:         WPSU  KUOW"
+            echo "Classical:    KING  WQXR"
+            echo "Sports:       WEEI"
+            return 0
+            ;;
+        WPSU | wpsu) STREAM=https://wpsu-ice.streamguys1.com/wpsu1;;
+        KUOW | kuow) STREAM=https://14933.live.streamtheworld.com/KUOWFM_AAC.aac;;
+        KING | king) STREAM=https://classicalking.streamguys1.com/king-fm-aac-128k;;
+        WQXR | wqxr) STREAM=https://stream.wqxr.org/wqxr-web;;
+        WEEI | weei) STREAM=http://stream.abacast.net/direct/audacy-weeifmaac-imc;;
+    esac
+    ffplay -v warning -nodisp $STREAM
+}
+
+loop() {                # Loop playback of an audio file
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
+        echo "Usage:  loop <FILE>"
+    else
+        while :; do afplay -q 1 $1; done
+    fi
+}
+
+ytdl() {                # Download audio from YouTube as an MP3
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  ytdl <URL> [<LOCAL DEST>]"
     else
         if [[ -z $2 ]] ; then
@@ -208,10 +252,21 @@ ytdl() {
     fi
 }
 
+#' Git ----
+git-del-history() {     # Remove a file from git history
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
+        echo "Usage:  git-del-history <FILE>"
+    else
+        git filter-branch --force --index-filter \
+            "git rm --cached --ignore-unmatch $1" \
+            --prune-empty --tag-name-filter cat -- --all
+        echo "Next, run: git push origin --force --all"
+    fi
+}
 
 # Copilot 
 # Replace w/ output of `gh copilot alias -- bash` to update
-ghcs() {
+ghcs() {                # Wrapper for `gh copilot suggest`
 	TARGET="shell"
 	local GH_DEBUG="$GH_DEBUG"
 	local GH_HOST="$GH_HOST"
@@ -254,7 +309,7 @@ ghcs() {
 
 	local OPT OPTARG OPTIND
 	while getopts "dht:-:" OPT; do
-		if [ "$OPT" = "-" ]; then     # long option: reformulate OPT and OPTARG
+		if [[ "$OPT" = "-" ]]; then     # long option: reformulate OPT and OPTARG
 			OPT="${OPTARG%%=*}"       # extract long option name
 			OPTARG="${OPTARG#"$OPT"}" # extract long option argument (may be empty)
 			OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
@@ -286,7 +341,7 @@ ghcs() {
 	TMPFILE="$(mktemp -t gh-copilotXXXXXX)"
 	trap 'rm -f "$TMPFILE"' EXIT
 	if GH_DEBUG="$GH_DEBUG" GH_HOST="$GH_HOST" gh copilot suggest -t "$TARGET" "$@" --shell-out "$TMPFILE"; then
-		if [ -s "$TMPFILE" ]; then
+		if [[ -s "$TMPFILE" ]]; then
 			FIXED_CMD="$(cat $TMPFILE)"
 			builtin history -s -- $(builtin history 1 | cut -d' ' -f4-); builtin history -s -- "$FIXED_CMD"
 			echo
@@ -297,7 +352,7 @@ ghcs() {
 	fi
 }
 
-ghce() {
+ghce() {                # Wrapper for `gh copilot explain`
 	local GH_DEBUG="$GH_DEBUG"
 	local GH_HOST="$GH_HOST"
 
@@ -326,7 +381,7 @@ ghce() {
 
 	local OPT OPTARG OPTIND
 	while getopts "dh-:" OPT; do
-		if [ "$OPT" = "-" ]; then     # long option: reformulate OPT and OPTARG
+		if [[ "$OPT" = "-" ]]; then     # long option: reformulate OPT and OPTARG
 			OPT="${OPTARG%%=*}"       # extract long option name
 			OPTARG="${OPTARG#"$OPT"}" # extract long option argument (may be empty)
 			OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`

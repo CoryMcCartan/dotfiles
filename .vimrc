@@ -45,24 +45,27 @@ autocmd FileType tex set regexpengine=1
 au FileType crontab setlocal bkc=yes
 "}}}
 " Syntax {{{
-" filetype based plugins etc
-filetype plugin on
-" autocomplete
-set omnifunc=syntaxcomplete#Complete " autocomplete
-set completeopt=longest,menuone
-inoremap <expr> <Esc>      pumvisible() ? "\<C-e>" : "\<Esc>"
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-" refactoring
-nnoremap gr gdva{:s/<C-R>///g<left><left>
-nnoremap gR gD:%s/<C-R>///g<left><left>"}]
 " syntax highighting
 syntax on
+" filetype based plugins etc
+" filetype plugin on
+" autocomplete
+" set omnifunc=syntaxcomplete#Complete " autocomplete
+"set omnifunc=ale#completion#OmniFunc
+"let g:ale_completion_enabled = 1
+
+" set completeopt=longest,menuone
+" inoremap <expr> <Esc>      pumvisible() ? "\<C-e>" : "\<Esc>"
+" inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" refactoring
+" nnoremap gr gdva{:s/<C-R>///g<left><left>
+" nnoremap gR gD:%s/<C-R>///g<left><left>"}]
 " don't jump to matching tags/brackets
 set matchtime=0
 " LaTeX
 let g:tex_flavor = "latex"
 " SQL
-let g:omni_sql_no_default_maps = 1
+" let g:omni_sql_no_default_maps = 1
 "}}}
 " Keyboard shortcuts {{{
 " replace : with ;

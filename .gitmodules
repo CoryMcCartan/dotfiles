@@ -7,3 +7,6 @@
 [submodule "/Users/cmccartan/.vim/pack/colors/opt/everforest"]
 	path = /Users/cmccartan/.vim/pack/colors/opt/everforest
 	url = https://github.com/sainnhe/everforest
+[submodule ".vim/pack/dist/start/LanguageClient-neovim"]
+	path = .vim/pack/dist/start/LanguageClient-neovim
+	url = https://github.com/autozimu/LanguageClient-neovim

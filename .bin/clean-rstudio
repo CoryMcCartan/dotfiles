@@ -33,6 +33,7 @@ rm bin/rsession
 rm Frameworks/*.dylib
 
 cd quarto/bin/tools
+rm aarch64/typst
 ln -s $(readlink -f $(which typst)) aarch64/typst
 rm -rf x86_64
 

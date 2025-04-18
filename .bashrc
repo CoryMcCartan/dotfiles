@@ -1,4 +1,5 @@
-# completions
+# bash options
+set -o vi
 complete -df -X '*.pdf' vim
 # complete -df -X '!*.qmd' quarto
 
