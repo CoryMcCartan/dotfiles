@@ -37,6 +37,7 @@ autocmd FileType tex setlocal tw=80
 autocmd FileType html,python,sass set foldmethod=indent
 autocmd FileType python,r,rmd set nosmartindent 
 autocmd FileType sass setlocal sw=4 sts=4
+autocmd FileType make set noexpandtab sw=4 sts=0
 " syntax highlighting
 autocmd BufNewFile,BufRead *.tikz   set syntax=tex
 autocmd BufNewFile,BufRead .Rprofile   set syntax=r

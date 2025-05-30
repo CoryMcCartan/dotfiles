@@ -4,7 +4,9 @@
 # ALIASES
 ################
 
+alias quietly='>/dev/null '
 alias R='R --no-save -q'
+alias qmd='quarto render'
 alias tree='Rscript -e "fs::dir_tree(recurse=5)"'
 alias top='top -i 20 -o mem'
 
@@ -74,32 +76,41 @@ status() {              # Print terminal status
 }
 
 del() {                 # Move a file to the Trash
-    mv $1 ~/Trash
+    mv "$1" ~/Trash
 }
 
 md() {                  # Create a directory and move into it
-    mkdir $1
-    cd $1
+    mkdir "$1"
+    cd "$1"
 }
 
 fcopy() {               # Copy a file to a special clipboard
-    cp $1 ~/.bin/.tmp/f-c-p-TEMPFILE
-    basename $1 > ~/.bin/.tmp/f-c-p-FILENAME
+    cp "$1" ~/.bin/.tmp/f-c-p-TEMPFILE
+    basename "$1" > ~/.bin/.tmp/f-c-p-FILENAME
 }
 fpaste() {              # Paste a file from the special clipboard
     if [[ -z "$1" ]]; then
         cp ~/.bin/.tmp/f-c-p-TEMPFILE `cat ~/.bin/.tmp/f-c-p-FILENAME`
     else
-        cp ~/.bin/.tmp/f-c-p-TEMPFILE $1
+        cp ~/.bin/.tmp/f-c-p-TEMPFILE "$1"
     fi
 }
 
 strip-intel() {         # Remove x86_64 code from a binary
-    lipo -remove x86_64 $1 -output $1
+    lipo -remove x86_64 "$1" -output "$1"
 }
 
 
-#' PDF and Image processing -----
+#' Web browsing -----
+goog() {                # Search Google
+    chrome --new-tab "https://www.google.com/search?q=$1" >/dev/null
+}
+wiki() {                # Open Wikipedia entry
+    chrome --new-tab "https://en.wikipedia.org/wiki/$1" >/dev/null
+}
+
+
+#' PDF and image processing -----
 
 cpdf() {                # Concatenate PDF files
     if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
@@ -141,7 +152,7 @@ pdf2gif() {             # Convert PDF pages to GIF
 }
 
 exif() {                # Print EXIF information
-    identify -format '%[EXIF:*]' $1
+    identify -format '%[EXIF:*]' "$1"
 }
 
 #' Rendering and presenting ----
@@ -180,12 +191,17 @@ tinytex() {             # Compile TeX via TinyTeX
     fi
 }
 
+qw() {                  # Quarto live updating
+    chrome --new-window --app=http://localhost:5118/web/viewer.html
+    quarto preview $1 --no-browser --port 5118
+}
+
 arxivify() {            # Create a ZIP file for arXiv
     if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  arxivify <FILE.qmd> <other directories>"
     else
         if [[ $1 != *.qmd ]] ; then
-            base=$1
+            base="$1"
         else
             base="{$1%.qmd}"
         fi
@@ -218,25 +234,28 @@ radio() {               # Play radio stations
         "-h" | "--help" | "")
             echo "Usage:  radio <CALLSIGN>"
             echo
-            echo "News:         WPSU  KUOW"
-            echo "Classical:    KING  WQXR"
+            echo "News:         WPSU  KUOW  BBC"
+            echo "Classical:    KING  WQXR  WFMT  ANCIENT"
             echo "Sports:       WEEI"
             return 0
             ;;
         WPSU | wpsu) STREAM=https://wpsu-ice.streamguys1.com/wpsu1;;
         KUOW | kuow) STREAM=https://14933.live.streamtheworld.com/KUOWFM_AAC.aac;;
+        BBC | bbc)   STREAM=http://stream.live.vc.bbcmedia.co.uk/bbc_world_service;;
         KING | king) STREAM=https://classicalking.streamguys1.com/king-fm-aac-128k;;
         WQXR | wqxr) STREAM=https://stream.wqxr.org/wqxr-web;;
+        WFMT | wfmt) STREAM=https://wfmt-live.streamguys1.com/wfmt128-aac;;
         WEEI | weei) STREAM=http://stream.abacast.net/direct/audacy-weeifmaac-imc;;
+        ANCIENT | ancient) STREAM=http://stream.ancientfm.com:8058/stream;;
     esac
-    ffplay -v warning -nodisp $STREAM
+    ffplay -v warning -nodisp -volume 80 $STREAM
 }
 
 loop() {                # Loop playback of an audio file
     if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  loop <FILE>"
     else
-        while :; do afplay -q 1 $1; done
+        while :; do afplay -q 1 "$1"; done
     fi
 }
 

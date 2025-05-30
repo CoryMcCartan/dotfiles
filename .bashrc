@@ -1,5 +1,6 @@
 # bash options
-set -o vi
+# set -o vi
+shopt -s cdspell
 complete -df -X '*.pdf' vim
 # complete -df -X '!*.qmd' quarto
 
@@ -18,5 +19,10 @@ fi
 if [[ $TERM != linux ]]; then
     source ~/.bin/promptline.sh
 fi
+
+# FZF
+export FZF_DEFAULT_OPTS="--tmux --style=full"
+export FZF_DEFAULT_COMMAND="find . -type f ! -path '*/.DS_Store' ! -path '*/.Rproj.user*' ! -path '*/.git/*'"
+eval "$(fzf --bash)"
 
 status

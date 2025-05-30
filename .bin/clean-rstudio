@@ -3,7 +3,7 @@
 pushd /Applications/RStudio.app/Contents/
 
 strip-intel() {
-    lipo -remove x86_64 $1 -output $1
+    lipo -remove x86_64 "$1" -output "$1"
 }
 
 # Clean up Electron
@@ -17,7 +17,7 @@ cd Resources
 rm v8_context_snapshot.x86_64.bin
 for lproj in *.lproj
 do
-    [ "$lib" != "en.lproj" ] && rm -r "$name"
+    [ "$lproj" != "en.lproj" ] && rm -r "$lproj"
 done
 popd
 
@@ -25,7 +25,7 @@ popd
 cd Resources
 for lproj in *.lproj
 do
-    [ "$lib" != "en.lproj" ] && rm -r "$name"
+    [ "$lproj" != "en.lproj" ] && rm -r "$lproj"
 done
 
 cd app
