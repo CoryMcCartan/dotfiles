@@ -3,3 +3,12 @@
 .Rdata
 .httr-oauth
 .DS_Store
+
+*.tmp
+*.bak
+*.pdf
+*.rds
+
+data-raw/*
+!data-raw/*.R
+!data-raw/*.md

@@ -12,6 +12,9 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[color "diff"]
+    old = magenta
+    new = yellow
 [init]
 	defaultBranch = main
 [push]

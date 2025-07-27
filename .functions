@@ -157,8 +157,9 @@ exif() {                # Print EXIF information
 
 #' Rendering and presenting ----
 
-serve() {               # Local Python HTTP server
-    python -m http.server
+serve() {               # Local Rust HTTP server
+    #python -m http.server
+    devserver
 }
 
 rmd() {                 # Compile an R Markdown file
@@ -280,6 +281,18 @@ git-del-history() {     # Remove a file from git history
             "git rm --cached --ignore-unmatch $1" \
             --prune-empty --tag-name-filter cat -- --all
         echo "Next, run: git push origin --force --all"
+    fi
+}
+
+gca() {                 # Add and commit all modified files
+    if [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
+        echo "Usage:  gca [<MESSAGE>]"
+        echo "Message can be typed after running `gca` or provided at the command line."
+    else
+        git add -u
+        git status
+        read -p "Commit message: $1" msg
+        git commit -m "$1$msg"
     fi
 }
 

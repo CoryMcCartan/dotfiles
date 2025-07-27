@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 
-pushd /Applications/RStudio.app/Contents/
+pushd /Applications/Posistron/Contents/
 
 strip-intel() {
     lipo -remove x86_64 "$1" -output "$1"
 }
 
 # Clean up Electron
-pushd "Frameworks/Electron Framework.framework/Versions/Current"
-strip-intel "Electron Framework"
-for lib in Libraries/*.dylib
-do
-    strip-intel "$lib"
-done
-cd Resources
-rm v8_context_snapshot.x86_64.bin
+pushd "Frameworks/Electron Framework.framework/Versions/Current/Resource"
 for lproj in *.lproj
 do
     [ "$lproj" != "en.lproj" ] && rm -r "$lproj"
@@ -29,9 +22,17 @@ do
 done
 
 cd app
-rm bin/rsession
-rm Frameworks/*.dylib
 rm -rf quarto
 ln -s /Applications/quarto quarto
+
+cd extensions
+pushd positron-assistant/resources/copilot
+rm -rf x64
+popd
+cd bootstrap
+rm -rf x64
+cd ..
+
+defaults write -app Positron ApplePressAndHoldEnabled -bool false
 
 popd

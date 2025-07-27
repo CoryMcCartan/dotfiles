@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+pushd /opt/gfortran/
+
+strip-intel() {
+    sudo lipo -remove x86_64 "$1" -output "$1"
+}
+
+sudo rm -rf lib/gcc/x86_64*
+strip-intel lib/libcc1.0.so
+
+sudo rm bin/x86_64*
+strip-intel bin/gfortran
+
+sudo ln -s /opt/gfortran /opt/R/arm64/gfortran
