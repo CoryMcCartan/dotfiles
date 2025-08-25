@@ -1,0 +1,34 @@
+#!/usr/bin/env Rscript --vanilla
+
+doc <- 'Excel to CSV converter
+
+Usage:
+  xl2csv <file> [--sheet=<num>] [--output=<file>]
+  xl2csv list <file>
+
+Options:
+  -h --help         Show this screen.
+  --sheet=<num>     Sheet to extract, as an index or string  [default: 1].
+  --output=<file>   The output path. Defaults to the input file 
+                    with the extension changed to "csv".
+'
+
+args = docopt::docopt(doc)
+
+if (!file.exists(args$file)) {
+    cli::cli_abort("File not found.")
+}
+
+if (args$list) {
+    sheets = readxl::excel_sheets(args$file)
+    print(data.frame(name = sheets))
+} else {
+    if (!is.na(suppressWarnings(as.integer(args$sheet)))) {
+        args$sheet = as.integer(args$sheet)
+    }
+    if (is.null(args$output)) {
+        args$output = sub("\\.xlsx?$", ".csv", args$file)
+    }
+    readr::write_csv(readxl::read_excel(args$file, sheet=args$sheet), args$output)
+}
+

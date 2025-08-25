@@ -13,8 +13,12 @@ set expandtab
 set autoindent 
 set copyindent 
 set smartindent 
+set breakindent
 " 80 character max 
 set colorcolumn=80 
+" wrap
+set nowrap
+set linebreak
 "}}}
 " Autocommands {{{
 " commenting
@@ -33,6 +37,7 @@ autocmd FileType css let b:comment_leader = '/* '
 autocmd FileType css let b:comment_ender = ' */' 
 " word wrap
 autocmd FileType tex setlocal tw=80 	
+autocmd FileType quarto set wrap
 " filetype indenting
 autocmd FileType html,python,sass set foldmethod=indent
 autocmd FileType python,r,rmd set nosmartindent 
@@ -144,8 +149,6 @@ nnoremap <space> za
 vnoremap <space> za
 set foldmethod=syntax
 set foldlevelstart=2
-" wrap
-set wrap!
 " hidden characters (whitespace)
 set listchars=tab:>.,trail:.,extends:#,nbsp:.
 "}}}
@@ -249,7 +252,7 @@ set belloff=all
 " set <M-b>=b
 " imap b <M-b>
 " only do syntax highlighting for first 160 columns
-set synmaxcol=160
+set synmaxcol=640
 " for this file's folds
 set modelines=1
 "}}} vim:foldmethod=marker:foldlevel=0
