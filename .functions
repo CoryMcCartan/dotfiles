@@ -125,7 +125,7 @@ letterhead() {          # Add university letterhead to PDF
     if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  letterhead <FILE>"
     else
-        qpdf $1 --replace-input --underlay $LH --
+        qpdf "$1" --replace-input --overlay "$LH" --
     fi
 }
 

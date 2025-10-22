@@ -51,7 +51,7 @@ options(
     alarm.use_cache = TRUE,
     geocoder.use_cache = TRUE,
 
-    noaakey="CqXqezpbMfHpYaAifExWlEqcswzBDGSK",
+    noaakey=Sys.getenv("NOAA_KEY"),
 
     usethis.full_name = "Cory McCartan",
     styler.cache_root = "styler",
@@ -72,8 +72,8 @@ options(
 )
 
 
-if (interactive() && requireNamespace("colorout", quietly=TRUE)) {
-    require("colorout", quietly=TRUE)
+if (interactive() && requireNamespace("colorout", quietly=TRUE) && Sys.getenv("RSTUDIO") != "1") {
+    suppressWarnings(require("colorout", quietly=TRUE))
     setOutputColors(normal=146, verbose=FALSE)
 }
 if (interactive() && requireNamespace("beepr", quietly=TRUE)) {

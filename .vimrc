@@ -185,9 +185,6 @@ nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :source $MYVIMRC<CR><CR>:noh<CR><CR>
 nmap <leader>fd yyO<Esc>P$T)DA;<Esc>
 nmap <leader>tc ggVG"*y
-nmap <leader>q" lbi"<Esc>xepb
-nmap <leader>q( lbi(<Esc>lxepb
-nmap <leader>q[ lbi[<Esc>lxepb
 "}}}
 " Windows and tabs {{{
 " split
@@ -237,6 +234,41 @@ set nocompatible
 " set t_Co=256" 
 set laststatus=2 " Always display the statusline in all windows
 set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+"}}}
+" Slime {{{
+let g:slime_target = "tmux"
+let g:slime_default_config = {"socket_name": "default", "target_pane": "{last}"}
+let g:slime_no_mappings = 1
+" use s to send
+nnoremap s <Nop>
+"send visual selection
+xmap s <Plug>SlimeRegionSend
+"send based on motion or text object
+nmap s <Plug>SlimeMotionSend
+"send line
+nmap ss <Plug>SlimeLineSend
+nnoremap <buffer> <CR> :execute "normal \<Plug>SlimeLineSend"<CR>gj
+" }}}
+" Bracketed paste {{{
+" Code from <https://github.com/ConradIrwin/vim-bracketed-paste/blob/master/plugin/bracketed-paste.vim>
+if exists("g:loaded_bracketed_paste")
+      finish
+endif
+let g:loaded_bracketed_paste = 1
+let &t_ti .= "\<Esc>[?2004h"
+let &t_te = "\e[?2004l" . &t_te
+function! XTermPasteBegin(ret)
+      set pastetoggle=<f29>
+        set paste
+          return a:ret
+endfunction
+execute "set <f28>=\<Esc>[200~"
+execute "set <f29>=\<Esc>[201~"
+map <expr> <f28> XTermPasteBegin("i")
+imap <expr> <f28> XTermPasteBegin("")
+vmap <expr> <f28> XTermPasteBegin("c")
+cmap <f28> <nop>
+cmap <f29> <nop>
 "}}}
 " Misc. {{{
 " performance

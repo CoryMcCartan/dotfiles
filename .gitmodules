@@ -10,3 +10,6 @@
 [submodule ".vim/pack/dist/start/LanguageClient-neovim"]
 	path = .vim/pack/dist/start/LanguageClient-neovim
 	url = https://github.com/autozimu/LanguageClient-neovim
+[submodule "/Users/cmccartan/.vim/pack/dist/start/vim-slime"]
+	path = /Users/cmccartan/.vim/pack/dist/start/vim-slime
+	url = https://github.com/jpalardy/vim-slime.git
