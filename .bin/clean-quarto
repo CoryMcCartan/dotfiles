@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
+set -e
 
 pushd /Applications/quarto/bin/tools
 
 rm -rf x86_64
 
 cd aarch64
-strip-intel() {
-    lipo -remove x86_64 "$1" -output "$1"
-}
-strip-intel deno
-strip-intel esbuild
-strip-intel pandoc
-strip-intel dart-sass/src/dart
-
 rm typst
 ln -s $(which typst) typst

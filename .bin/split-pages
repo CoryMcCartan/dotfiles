@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-for file in "$@"
-do
-    touch ~/.bin/.tmp/split_pdf.pdf
-    rm ~/.bin/.tmp/split_pdf.pdf
-    ~/.bin/sejda/bin/sejda-console splitdownthemiddle -f $file -o ~/.bin/.tmp
-    mv ~/.bin/.tmp/$file split-$file
-done

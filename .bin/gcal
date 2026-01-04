@@ -1,1 +1,5 @@
-/Users/cmccartan/Documents/Code/R/calendar/gcal
+#!/usr/bin/env bash
+pushd ~/Documents/Code/R/calendar > /dev/null
+./gcal
+popd > /dev/null
+

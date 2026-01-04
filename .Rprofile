@@ -28,30 +28,28 @@
 options(
     repos = c(CRAN = "http://cran.rstudio.com"),
 
-    digits=5,
-    scipen=1,
-    max.print=200,
+    scipen = 1,
+    max.print = 200,
 
-    pillar.bold=TRUE,
-    pillar.print_max=30,
-    pillar.advice=FALSE,
+    pillar.bold = TRUE,
+    pillar.print_max = 30,
+    pillar.advice = FALSE,
 
-    pkg.build_extra_flags=FALSE,
-    tidyverse.quiet=TRUE,
-    dplyr.summarise.inform=FALSE,
-    readr.show_types=FALSE,
+    pkg.build_extra_flags = FALSE,
+    tidyverse.quiet = TRUE,
+    dplyr.summarise.inform = FALSE,
+    readr.show_types = FALSE,
 
-    ggplot2.continuous.colour=.scale_color_sound_sunset_c,
-    ggplot2.continuous.fill=.scale_fill_sound_sunset_c,
-    ggplot2.discrete.colour=.RAINIER,
-    ggplot2.discrete.fill=.RAINIER,
+    ggplot2.continuous.colour = .scale_color_sound_sunset_c,
+    ggplot2.continuous.fill = .scale_fill_sound_sunset_c,
+    ggplot2.discrete.colour = .RAINIER,
+    ggplot2.discrete.fill = .RAINIER,
 
     tigris_use_cache = TRUE,
     tinytiger.use_cache = TRUE,
     alarm.use_cache = TRUE,
-    geocoder.use_cache = TRUE,
 
-    noaakey=Sys.getenv("NOAA_KEY"),
+    noaakey = Sys.getenv("NOAA_KEY"),
 
     usethis.full_name = "Cory McCartan",
     styler.cache_root = "styler",
@@ -66,7 +64,7 @@ options(
         Version = "0.0.0.9000"
     ),
 
-    mc.cores = parallel::detectCores(),
+    # mc.cores = parallel::detectCores(),
     shiny.port = 8080L,
     rgl.printRglwidget = TRUE
 )
@@ -75,9 +73,6 @@ options(
 if (interactive() && requireNamespace("colorout", quietly=TRUE) && Sys.getenv("RSTUDIO") != "1") {
     suppressWarnings(require("colorout", quietly=TRUE))
     setOutputColors(normal=146, verbose=FALSE)
-}
-if (interactive() && requireNamespace("beepr", quietly=TRUE)) {
-    .beep = function() beepr::beep(1)
 }
 if (interactive() && requireNamespace("desc", quietly=TRUE)) {
     .alldeps = function(package=NULL, ignore=character(0), linking=TRUE) {
@@ -106,42 +101,20 @@ if (interactive()) {
         })
     }
 
-    hist <- function(x, ...) {
-        if (is.numeric(x)) 
-            graphics::hist(x, ..., border="white", col="gray")
-        else
-            graphics::hist(x, ...)
-    }
-
-
-    .venn <- function(x, y) {
-        str_pad <- stringr::str_pad
-            both = intersect(x, y)
-            x_only = setdiff(x, both)
-            y_only = setdiff(y, both)
-            x_lab = deparse(substitute(x))
-            y_lab = deparse(substitute(y))
-            ls = c(length(both), length(x_only), length(y_only))
-            ws = pmin(c(max(nchar(both)), max(nchar(x_only)), max(nchar(y_only))), 25)
-            both_col = c(str_pad("both", ws[1], side="both"), str_pad("", ws[1], pad="-"),
-                    format(both), rep(str_pad("", ws[1]), max(ls) - min(ls)))
-            x_col = c(str_pad(x_lab, ws[2], side="both"), str_pad("", ws[2], pad="-"),
-                    format(x_only), rep(str_pad("", ws[2]), max(ls) - min(ls)))
-            y_col = c(str_pad(y_lab, ws[3], side="both"), str_pad("", ws[3], pad="-"),
-                    format(y_only), rep(str_pad("", ws[3]), max(ls) - min(ls)))
-            cat(stringr::str_c(
-                        stringr::str_trunc(x_col[seq_len(max(ls))], ws[2]),
-                        " | ",
-                        stringr::str_trunc(both_col[seq_len(max(ls))], ws[1]),
-                        " | ",
-                        stringr::str_trunc(y_col[seq_len(max(ls))], ws[3]),
-                        collapse="\n"
-                        ))
-    }
-
-    .init_proj <- function() {
-      c(".Rproj.user", ".Rhistory", ".RData", ".Ruserdata")
-    }
+    require("grDevices", quietly = TRUE)
+    require("graphics", quietly = TRUE)
+    attach(
+       list(
+            hist = function(x, ...) {
+                if (is.numeric(x)) 
+                    graphics::hist(x, ..., border="white", col="gray")
+                else
+                    graphics::hist(x, ...)
+            }
+        ),
+        name = "shims",
+        warn.conflicts = FALSE
+    )
 }
 #if (interactive() && Sys.getenv("RSTUDIO") == "1") thematic::thematic_on()
 

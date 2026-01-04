@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-pushd /Users/cmccartan/Documents/Analyses/wordle > /dev/null
+pushd ~/Documents/Analyses/wordle > /dev/null
 Rscript R/wordle.R
 popd > /dev/null

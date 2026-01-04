@@ -9,6 +9,7 @@ alias R='R --no-save -q'
 alias qmd='quarto render'
 alias tree='Rscript -e "fs::dir_tree(recurse=5)"'
 alias top='top -i 20 -o mem'
+alias tldr='tldr -c --short-options'
 
 # cool colors
 alias ls='ls -pFhG'
@@ -72,7 +73,8 @@ status() {              # Print terminal status
     echo -n -e "  ${A} TERMINAL ${B} CORY McCARTAN ${C} "
     date +"%l:%M %p %A, %B %e, %Y" 
     echo 
-
+    ascii-moon-phase --size 6 --light-char "█" --dark-char "."
+    echo
 }
 
 del() {                 # Move a file to the Trash
@@ -134,7 +136,7 @@ wta() {                 # Set white pixels to transparent
     if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  wta <IMAGE>  (will overwrite)"
     else
-        convert $1 -transparent white $1
+        magick $1 -transparent white $1
     fi
 }
 
@@ -147,7 +149,7 @@ pdf2gif() {             # Convert PDF pages to GIF
         else
             fout=$2
         fi
-        convert -alpha deactivate -verbose -delay 420 -loop 0 -density 150 $1 $fout
+        magick -alpha deactivate -verbose -delay 420 -loop 0 -density 150 $1 $fout
     fi
 }
 
@@ -237,16 +239,22 @@ radio() {               # Play radio stations
             echo
             echo "News:         WPSU  KUOW  BBC"
             echo "Classical:    KING  WQXR  WFMT  ANCIENT"
+            echo "Other music:  KNKX2 KDKI  WICR  WICR2  WMKV  KEXP"
             echo "Sports:       WEEI"
             return 0
             ;;
         WPSU | wpsu) STREAM=https://wpsu-ice.streamguys1.com/wpsu1;;
         KUOW | kuow) STREAM=https://14933.live.streamtheworld.com/KUOWFM_AAC.aac;;
-        BBC | bbc)   STREAM=http://stream.live.vc.bbcmedia.co.uk/bbc_world_service;;
+        BBC  | bbc)  STREAM=http://stream.live.vc.bbcmedia.co.uk/bbc_world_service;;
         KING | king) STREAM=https://classicalking.streamguys1.com/king-fm-aac-128k;;
         WQXR | wqxr) STREAM=https://stream.wqxr.org/wqxr-web;;
         WFMT | wfmt) STREAM=https://wfmt-live.streamguys1.com/wfmt128-aac;;
         WEEI | weei) STREAM=http://stream.abacast.net/direct/audacy-weeifmaac-imc;;
+        KEXP | kexp) STREAM=https://kexp.streamguys1.com/kexp160.aac;;
+        KDKI | kdki) STREAM=https://s47.myradiostream.com/:14800/listen.mp3;;
+        WICR | wicr) STREAM=https://live.amperwave.net/direct/univofindy-wicrhd1aac-ibc4;;
+        WMKV | wmkv) STREAM=https://ice7.securenetsystems.net/WMKVFM;;
+        KNKX2 | knkx2) STREAM=https://knkx-live-a.edge.audiocdn.com/6285_256k;;
         ANCIENT | ancient) STREAM=http://stream.ancientfm.com:8058/stream;;
     esac
     ffplay -v warning -nodisp -volume 80 $STREAM
@@ -265,11 +273,25 @@ ytdl() {                # Download audio from YouTube as an MP3
         echo "Usage:  ytdl <URL> [<LOCAL DEST>]"
     else
         if [[ -z $2 ]] ; then
-            youtube-dl -i -o "%(title)s.%(ext)s" --extract-audio --audio-format mp3 --audio-quality 0 $1
+            yt-dlp -i -o "%(title)s.%(ext)s" --extract-audio --audio-format mp3 --audio-quality 0 $1
         else 
-            youtube-dl -i -o $2 --extract-audio --audio-format mp3 --audio-quality 0 $1
+            yt-dlp -i -o $2 --extract-audio --audio-format mp3 --audio-quality 0 $1
         fi
     fi
+}
+
+rip() {
+    pushd ~/Music/
+    mkdir .tmp
+    cd .tmp/
+    cdparanoia -B
+    drutil eject
+    for i in *.cdda.wav; do ffmpeg -i "$i" -acodec libmp3lame "${i%.*}.mp3"; done
+    mv *.mp3 ../upload/
+    rm *.cdda.wav
+    cd ..
+    rmdir .tmp
+    popd
 }
 
 #' Git ----

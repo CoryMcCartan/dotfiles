@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
+set -e
 
-pushd /Applications/Posistron/Contents/
+pushd /Applications/Positron.app/Contents/
 
 strip-intel() {
     lipo -remove x86_64 "$1" -output "$1"
 }
 
 # Clean up Electron
-pushd "Frameworks/Electron Framework.framework/Versions/Current/Resource"
+pushd "Frameworks/Electron Framework.framework/Versions/Current/Resources"
 for lproj in *.lproj
 do
     [ "$lproj" != "en.lproj" ] && rm -r "$lproj"
