@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+ln -f -s ~/.positron/extensions/posit.air-vscode-*/bundled/bin/air ~/.local/bin/
+
+
 pushd /Applications/Positron.app/Contents/
 
 strip-intel() {
@@ -26,13 +29,13 @@ cd app
 rm -rf quarto
 ln -s /Applications/quarto quarto
 
-cd extensions
-pushd positron-assistant/resources/copilot
-rm -rf x64
-popd
-cd bootstrap
-rm -rf x64
-cd ..
+# cd extensions
+# pushd positron-assistant/resources/copilot
+# rm -rf x64
+# popd
+# cd bootstrap
+# rm -rf x64
+# cd ..
 
 defaults write -app Positron ApplePressAndHoldEnabled -bool false
 

@@ -177,7 +177,7 @@ set incsearch
 set showmatch
 set hlsearch
 set gdefault
-nnoremap <CR> :nohlsearch<CR><CR>
+" nnoremap <CR> :nohlsearch<CR><CR>
 "}}}
 " Custom Commands {{{
 command! Shebang 0put =\"#!/usr/bin/env \"|start!|w|! chmod +x %
