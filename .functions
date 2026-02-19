@@ -123,7 +123,8 @@ cpdf() {                # Concatenate PDF files
     if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]] ; then 
         echo "Usage:  cpdf <OUTPUT> <INPUT FILE(s)>"
     else
-        gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$1" "${@:2}"
+        # gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$1" "${@:2}"
+        pdfunite "${@:2}" "$1"
     fi
 }
 

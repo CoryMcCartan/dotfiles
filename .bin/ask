@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+if [[ $# -eq 0 ]] || [[ $1 == '-h' ]] || [[ $1 == '--help' ]] ; then 
+    echo 'Usage:  ask [-yn] <QUESTION>'
+    exit 0
+fi
+
+if [[ $1 == '-yn' ]]; then
+    YESNO='true'
+    MAX_TOKENS=1
+    SYS_PROMPT='Answer the question with either \"Yes\" or \"No\".'
+    shift
+else
+    YESNO='false'
+    MAX_TOKENS=25
+    SYS_PROMPT='Answer as concisely as possible---one word, even---with NO formatting.'
+fi
+
+if [ -p /dev/stdin ]; then
+    STDIN=" DATA: "$(cat | jq -Rs . | sed 's/^.//;s/.$//')
+    SYS_PROMPT="$SYS_PROMPT"' Additional data the question may be about is denoted by \"DATA:\".'
+else
+    STDIN=''
+fi
+
+
+RESPONSE=$(curl "https://api.groq.com/openai/v1/chat/completions" \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${GROQ_API_KEY}" \
+  --silent \
+  -d '{
+         "messages": [
+           { "role": "system", "content": "'"$SYS_PROMPT"'" },
+           { "role": "user", "content": "'"$*$STDIN"'" }
+         ],
+         "model": "llama-3.1-8b-instant",
+         "temperature": 0.01,
+         "max_completion_tokens": '$MAX_TOKENS',
+         "response_format": { "type": "text" }
+     }'
+ )
+
+ANSWER=$(echo $RESPONSE | jq '.choices[0].message.content' -r)
+if [[ $ANSWER == "null" ]]; then
+    echo $RESPONSE | jq '.'
+    exit 1
+elif $YESNO; then
+    if [[ $ANSWER =~ ^(Yes|yes)$ ]]; then
+        echo yes
+    elif [[ $ANSWER =~ ^(No|no)$ ]]; then
+        echo no
+    else
+        echo "ERROR: $ANSWER"
+        exit 2
+    fi
+else
+    echo $ANSWER
+fi

@@ -248,7 +248,7 @@ xmap s <Plug>SlimeRegionSend
 nmap s <Plug>SlimeMotionSend
 "send line
 nmap ss <Plug>SlimeLineSend
-nnoremap <buffer> <CR> :execute "normal \<Plug>SlimeLineSend"<CR>gj
+" nnoremap <buffer> <CR> :execute "normal \<Plug>SlimeLineSend"<CR>gj
 " }}}
 " Bracketed paste {{{
 " Code from <https://github.com/ConradIrwin/vim-bracketed-paste/blob/master/plugin/bracketed-paste.vim>
